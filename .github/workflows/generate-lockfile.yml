@@ -7,7 +7,7 @@ on:
       - package.json
       - .github/workflows/generate-lockfile.yml
 permissions:
-  contents: read
+  contents: write
 jobs:
   lockfile:
     runs-on: ubuntu-latest
@@ -22,6 +22,17 @@ jobs:
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Validate lockfile against package.json
         run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Commit verified lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          if git diff --cached --quiet; then
+            echo "package-lock.json is already current"
+          else
+            git commit -m "chore: commit verified package-lock.json"
+            git push
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: hnl-package-lock
