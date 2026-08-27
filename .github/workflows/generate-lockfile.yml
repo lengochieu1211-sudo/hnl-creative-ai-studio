@@ -1,13 +1,8 @@
 name: Generate npm lockfile artifact
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - package.json
-      - .github/workflows/generate-lockfile.yml
 permissions:
-  contents: write
+  contents: read
 jobs:
   lockfile:
     runs-on: ubuntu-latest
@@ -17,22 +12,11 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: package.json
-      - name: Generate package-lock.json
+          cache-dependency-path: package-lock.json
+      - name: Regenerate package-lock.json
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
       - name: Validate lockfile against package.json
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Commit verified lockfile
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          if git diff --cached --quiet; then
-            echo "package-lock.json is already current"
-          else
-            git commit -m "chore: commit verified package-lock.json"
-            git push
-          fi
       - uses: actions/upload-artifact@v4
         with:
           name: hnl-package-lock
