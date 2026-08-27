@@ -1,0 +1,10 @@
+{
+  "name": "HNL Creative AI Studio",
+  "description": "Local-first multimodal creative studio for image, video, design, documents, and optional Gemini AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "LOCAL_FIRST_CREATIVE_EDITOR",
+    "GEMINI_BYOK",
+    "OPTIONAL_SERVER_SIDE_GEMINI_API"
+  ]
+}
