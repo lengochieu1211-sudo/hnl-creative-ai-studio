@@ -29,7 +29,7 @@ jobs:
       - name: Build web
         run: npm run build:web
         env:
-          VITE_APP_VERSION: 1.1.0
+          VITE_APP_VERSION: 1.1.1
           VITE_BUILD_DATE: ${{ github.event.repository.updated_at }}
           VITE_COMMIT_SHA: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@v3
