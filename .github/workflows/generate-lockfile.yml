@@ -1,6 +1,11 @@
 name: Generate npm lockfile artifact
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - package.json
+      - .github/workflows/generate-lockfile.yml
 permissions:
   contents: read
 jobs:
