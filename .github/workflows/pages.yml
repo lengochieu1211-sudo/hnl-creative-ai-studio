@@ -1,0 +1,53 @@
+name: HNL Creative AI Web
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        shell: bash
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            echo "::warning::package-lock.json is absent; using npm install. Run the Generate npm lockfile artifact workflow and commit the resulting lockfile."
+            npm install --no-audit --no-fund
+          fi
+      - run: npm run typecheck
+      - run: npm test
+      - name: Build web
+        run: npm run build:web
+        env:
+          VITE_APP_VERSION: 1.1.0
+          VITE_BUILD_DATE: ${{ github.event.repository.updated_at }}
+          VITE_COMMIT_SHA: ${{ github.sha }}
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
