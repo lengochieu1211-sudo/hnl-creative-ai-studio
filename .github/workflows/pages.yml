@@ -19,17 +19,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dependencies
-        shell: bash
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund
-          else
-            echo "::warning::package-lock.json is absent; using npm install. Run the Generate npm lockfile artifact workflow and commit the resulting lockfile."
-            npm install --no-audit --no-fund
-          fi
-      - run: npm run typecheck
-      - run: npm test
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
       - name: Build web
         run: npm run build:web
         env:
