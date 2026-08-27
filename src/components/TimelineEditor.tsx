@@ -71,7 +71,7 @@ export const TimelineEditor: React.FC<TimelineEditorProps> = ({ timeline, onTime
       const dxSeconds = (e.clientX - drag.startClientX) / timeline.zoom;
       const sourceTrackIndex = timeline.tracks.findIndex((t) => t.id === drag.sourceTrackId);
       const rowDelta = Math.round((e.clientY - drag.startClientY) / 48);
-      let targetTrackIndex = Math.max(0, Math.min(timeline.tracks.length - 1, sourceTrackIndex + rowDelta));
+      const targetTrackIndex = Math.max(0, Math.min(timeline.tracks.length - 1, sourceTrackIndex + rowDelta));
       let targetTrack = timeline.tracks[targetTrackIndex];
       if (!compatibleTrack(drag.originalClip, targetTrack) || targetTrack.isLocked) targetTrack = timeline.tracks[sourceTrackIndex];
 
@@ -94,7 +94,7 @@ export const TimelineEditor: React.FC<TimelineEditorProps> = ({ timeline, onTime
 
       const tracks = timeline.tracks.map((track) => ({ ...track, clips: track.clips.filter((c) => c.id !== drag.clipId) }));
       const targetIndex = tracks.findIndex((t) => t.id === updatedClip.trackId);
-      trac{s[targetIndex].clips = [...tracks[targetIndex].clips, updatedClip].sort((a,b)=>a.start-b.start);
+      tracks[targetIndex].clips = [...tracks[targetIndex].clips, updatedClip].sort((a,b)=>a.start-b.start);
       const maxEnd = Math.max(1, ...tracks.flatMap((t) => t.clips.map((c) => c.start + c.duration)));
       onTimelineChange({ ...timeline, tracks, duration: Math.max(timeline.duration, maxEnd) });
     };
