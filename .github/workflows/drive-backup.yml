@@ -1,0 +1,38 @@
+name: HNL Drive Backup Artifact
+on:
+  push:
+    paths:
+      - '.github/workflows/drive-backup.yml'
+permissions:
+  contents: read
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build checkpoint package
+        shell: bash
+        run: |
+          set -euo pipefail
+          TS=$(date -u +%Y%m%d-%H%M%S)
+          mkdir -p backup
+          cat > backup/CHECKPOINT.md <<EOF
+          # HNL Creative AI Studio - Drive Backup Checkpoint
+
+          - Version: 1.1.1
+          - Branch: main
+          - Commit: $GITHUB_SHA
+          - Repository: lengochieu1211-sudo/hnl-creative-ai-studio
+          - Website: https://lengochieu1211-sudo.github.io/hnl-creative-ai-studio/
+          - Backup UTC: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          - Status: VI/EN bilingual UI, default Vietnamese; GitHub Pages CI-certified.
+          - Golden CI gate: npm ci -> TypeScript -> tests -> build -> Pages deploy.
+          EOF
+          git archive --format=zip --output="backup/HNL_CREATIVE_AI_STUDIO_v1.1.1_FULL_SOURCE_${TS}.zip" HEAD
+          sha256sum backup/HNL_CREATIVE_AI_STUDIO_v1.1.1_FULL_SOURCE_${TS}.zip > backup/SHA256.txt
+      - name: Upload Drive backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HNL_CREATIVE_AI_STUDIO_DRIVE_BACKUP_v1.1.1
+          path: backup/
+          retention-days: 30
